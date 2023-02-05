@@ -7,6 +7,8 @@ export default defineConfig({
     // 配置入口文件路径，API 解析将从这里开始
     entryFile: './src/index.ts',
   },
+  base: '/wishingjs/components',
+  publicPath: '/wishingjs/components/',
   title: 'wishingjs-components',
   themeConfig: {
     name: '',
