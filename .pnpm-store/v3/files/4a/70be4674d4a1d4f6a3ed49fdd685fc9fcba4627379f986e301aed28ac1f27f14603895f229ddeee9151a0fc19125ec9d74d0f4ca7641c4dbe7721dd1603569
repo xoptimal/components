@@ -1,0 +1,20 @@
+import webpack from '../compiled/webpack';
+import { IOpts as IConfigOpts } from './config/config';
+import { IConfig } from './types';
+declare type IOpts = {
+    cwd: string;
+    rootDir?: string;
+    entry: Record<string, string>;
+    config: IConfig;
+    onBuildComplete?: Function;
+    babelPreset?: any;
+    chainWebpack?: Function;
+    modifyWebpackConfig?: Function;
+    beforeBabelPlugins?: any[];
+    beforeBabelPresets?: any[];
+    extraBabelPlugins?: any[];
+    extraBabelPresets?: any[];
+    clean?: boolean;
+} & Pick<IConfigOpts, 'cache' | 'pkg'>;
+export declare function build(opts: IOpts): Promise<webpack.Stats>;
+export {};

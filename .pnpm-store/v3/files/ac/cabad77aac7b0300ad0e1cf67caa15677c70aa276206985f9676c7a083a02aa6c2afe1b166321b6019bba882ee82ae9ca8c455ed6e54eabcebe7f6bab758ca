@@ -1,0 +1,129 @@
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/utils.ts
+var utils_exports = {};
+__export(utils_exports, {
+  getCache: () => getCache,
+  getFileContentByRegExp: () => getFileContentByRegExp,
+  getFileRangeLines: () => getFileRangeLines,
+  getProjectRoot: () => getProjectRoot,
+  getRoutePathFromFsPath: () => getRoutePathFromFsPath,
+  parseCodeFrontmatter: () => parseCodeFrontmatter,
+  tryFatherBuildConfigs: () => tryFatherBuildConfigs
+});
+module.exports = __toCommonJS(utils_exports);
+var import_file_system_cache = __toESM(require("file-system-cache"));
+var import_fs = __toESM(require("fs"));
+var import_js_yaml = __toESM(require("js-yaml"));
+var import_path = __toESM(require("path"));
+var import_plugin_utils = require("umi/plugin-utils");
+function getRoutePathFromFsPath(fsPath) {
+  return import_plugin_utils.lodash.kebabCase((0, import_plugin_utils.winPath)(fsPath).replace(/((\/|^)index(\.[a-zA-Z-]+)?)?\.\w+$/g, ""));
+}
+var getFileRangeLines = (content2, range) => {
+  const [, start, end] = (range == null ? void 0 : range.match(/^L(\d+)(?:-L(\d+))?$/)) || [];
+  if (start) {
+    const lineStart = parseInt(start, 10) - 1;
+    const lineEnd = end ? parseInt(end, 10) : lineStart + 1;
+    return content2.split(/\r\n|\n/g).slice(lineStart, lineEnd).join("\n");
+  }
+  return content2;
+};
+var getFileContentByRegExp = (content, regexp, filePath) => {
+  try {
+    return content.match(eval(regexp))[0];
+  } catch (err) {
+    import_plugin_utils.logger.error(`Extract markdown content failed, use the full content.
+RegExp: ${regexp}
+File: ${filePath}
+Error: ${err}`);
+    return content;
+  }
+};
+function parseCodeFrontmatter(raw) {
+  const [, comment = "", code = ""] = raw.replace(/^\n\s*/, "").match(/^(\/\*\*[^]*?\n\s*\*\/)?(?:\s|\n)*([^]+)?$/);
+  const yamlComment = comment.replace(/^\/|\/$/g, "").replace(/(^|\n)\s*\*+/g, "$1");
+  let frontmatter = null;
+  try {
+    frontmatter = import_js_yaml.default.load(yamlComment);
+  } catch {
+  }
+  return { code: frontmatter ? code : raw, frontmatter };
+}
+var caches = {};
+var CACHE_PATH = "node_modules/.cache/dumi";
+function getCache(ns) {
+  if (process.env.DUMI_CACHE === "none") {
+    return { set() {
+    }, get() {
+    }, setSync() {
+    }, getSync() {
+    } };
+  }
+  return caches[ns] ?? (caches[ns] = (0, import_file_system_cache.default)({ basePath: import_path.default.join(CACHE_PATH, ns) }));
+}
+async function tryFatherBuildConfigs(cwd) {
+  let configs = [];
+  const APP_ROOT = process.env.APP_ROOT;
+  process.env.APP_ROOT = cwd;
+  try {
+    const { Service: FatherSvc } = await import("father/dist/service/service.js");
+    const { normalizeUserConfig: getBuildConfig } = await import("father/dist/builder/config.js");
+    const svc = new FatherSvc();
+    svc.commands.empty = {
+      name: "empty",
+      fn() {
+      },
+      configResolveMode: "loose",
+      plugin: { id: "empty" }
+    };
+    await svc.run({ name: "empty" });
+    configs = getBuildConfig(svc.config, svc.pkg);
+  } catch {
+  }
+  if (APP_ROOT)
+    process.env.APP_ROOT = APP_ROOT;
+  return configs;
+}
+function getProjectRoot(cwd) {
+  const splittedCwd = (0, import_plugin_utils.winPath)(cwd).split("/");
+  for (let level = -1; level >= -3; level -= 1) {
+    const rootCwd = splittedCwd.slice(0, level).join("/");
+    if (!rootCwd)
+      break;
+    const pkgPath = import_path.default.join(rootCwd, "package.json");
+    if (import_fs.default.existsSync(pkgPath) && (["pnpm-workspace.yaml", "lerna.json"].some((f) => import_fs.default.existsSync(import_path.default.join(rootCwd, f))) || require(pkgPath).workspace)) {
+      return (0, import_plugin_utils.winPath)(rootCwd);
+    }
+  }
+  return (0, import_plugin_utils.winPath)(cwd);
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  getCache,
+  getFileContentByRegExp,
+  getFileRangeLines,
+  getProjectRoot,
+  getRoutePathFromFsPath,
+  parseCodeFrontmatter,
+  tryFatherBuildConfigs
+});
