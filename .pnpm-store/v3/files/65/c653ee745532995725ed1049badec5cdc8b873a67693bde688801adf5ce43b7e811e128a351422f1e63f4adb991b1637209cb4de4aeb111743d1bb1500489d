@@ -1,6 +1,0 @@
-import type { Root } from 'hast';
-import type { Transformer } from 'unified';
-import type { IMdTransformerOptions } from '.';
-declare type IRehypeLinkOptions = Pick<IMdTransformerOptions, 'fileAbsPath' | 'routers'>;
-export default function rehypeLink(opts: IRehypeLinkOptions): Transformer<Root>;
-export {};
