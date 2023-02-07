@@ -1,0 +1,6 @@
+/**
+ * hook for get nav data
+ */
+export declare const useNavData: () => (import("./types").INavItem & {
+    children?: import("./types").INavItem[] | undefined;
+})[];

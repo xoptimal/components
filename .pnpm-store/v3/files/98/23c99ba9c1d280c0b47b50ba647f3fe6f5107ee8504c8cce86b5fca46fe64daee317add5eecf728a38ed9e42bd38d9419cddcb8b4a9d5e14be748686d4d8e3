@@ -1,0 +1,11 @@
+export declare function generateIconName(opts: {
+    collect: string;
+    icon: string;
+}): string;
+export declare function generateSvgr(opts: {
+    collect: string;
+    icon: string;
+    localIconDir: string;
+    iconifyOptions?: object;
+    svgrOptions?: object;
+}): Promise<string | null>;

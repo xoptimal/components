@@ -1,0 +1,90 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/features/depsOnDemand/depsOnDemand.ts
+var depsOnDemand_exports = {};
+__export(depsOnDemand_exports, {
+  default: () => depsOnDemand_default
+});
+module.exports = __toCommonJS(depsOnDemand_exports);
+var import_utils = require("@umijs/utils");
+var import_fs = require("fs");
+var import_path = require("path");
+var depsOnDemand_default = (api) => {
+  const bundlerWebpackPkg = require("@umijs/bundler-webpack/package.json");
+  api.onStart(() => {
+    const hasSwcConfig = api.config.srcTranspiler === "swc" || api.config.depTranspiler === "swc";
+    const swcDeps = [
+      {
+        name: "@swc/core",
+        version: `^${bundlerWebpackPkg.devDependencies["@swc/core"]}`
+      },
+      {
+        name: "swc-plugin-auto-css-modules",
+        version: `^${bundlerWebpackPkg.devDependencies["swc-plugin-auto-css-modules"]}`
+      }
+    ];
+    const { missingDeps } = checkDeps({
+      deps: swcDeps
+    });
+    if (hasSwcConfig && missingDeps.length) {
+      api.logger.info(
+        `Since swc is used, install swc dependencies ${missingDeps.map(({ name }) => import_utils.chalk.green(name)).join(", ")} on demand.`
+      );
+      addDeps({
+        pkgPath: api.pkgPath || (0, import_path.join)(api.cwd, "package.json"),
+        deps: missingDeps
+      });
+      (0, import_utils.installWithNpmClient)({
+        npmClient: api.appData.npmClient,
+        cwd: api.cwd
+      });
+    }
+  });
+  function checkDeps(opts) {
+    const missingDeps = [];
+    const { deps } = opts;
+    deps.forEach((dep) => {
+      var _a, _b;
+      const { name } = dep;
+      const installed = ((_a = api.pkg.dependencies) == null ? void 0 : _a[name]) || ((_b = api.pkg.devDependencies) == null ? void 0 : _b[name]);
+      if (!installed) {
+        missingDeps.push(dep);
+      } else {
+        const userVersion = import_utils.semver.minVersion(installed);
+        const isOutdated = !userVersion || import_utils.semver.ltr(userVersion, dep.version);
+        if (isOutdated) {
+          missingDeps.push(dep);
+        }
+      }
+    });
+    return {
+      missingDeps
+    };
+  }
+};
+function addDeps(opts) {
+  const pkg = (0, import_fs.existsSync)(opts.pkgPath) ? import_utils.fsExtra.readJSONSync(opts.pkgPath) : {};
+  pkg.devDependencies = pkg.devDependencies || {};
+  opts.deps.forEach((dep) => {
+    pkg.devDependencies[dep.name] = dep.version;
+  });
+  import_utils.fsExtra.writeJSONSync(opts.pkgPath, pkg, { spaces: 2 });
+}
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {});

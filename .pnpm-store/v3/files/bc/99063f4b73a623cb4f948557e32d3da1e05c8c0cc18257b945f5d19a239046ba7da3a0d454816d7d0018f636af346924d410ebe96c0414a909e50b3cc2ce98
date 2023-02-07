@@ -1,0 +1,144 @@
+{
+  "name": "@umijs/did-you-know",
+  "version": "1.0.2",
+  "description": "",
+  "keywords": [],
+  "homepage": "https://github.com/umijs/did-you-know#readme",
+  "bugs": {
+    "url": "https://github.com/umijs/did-you-know/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umijs/did-you-know.git"
+  },
+  "license": "MIT",
+  "main": "dist/plugin.js",
+  "scripts": {
+    "build": "father build",
+    "dev": "father dev",
+    "test": "jest"
+  },
+  "packageManager": "pnpm@7.3.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "authors": [
+    "chencheng <sorrycc@gmail.com> (https://github.com/sorrycc)"
+  ],
+  "didYouKnow": [
+    {
+      "text": "dev 模式下访问 /__umi 路由，可以发现很多有用的内部信息",
+      "majorVersion": 4
+    },
+    {
+      "text": "father 4 正式发布了",
+      "url": "https://zhuanlan.zhihu.com/p/558192063"
+    },
+    {
+      "text": "@umijs/max 是蚂蚁内网框架 Bigfish 的对外版本"
+    },
+    {
+      "text": "Umi 3 的 MFSU 可能会遇到奇怪的问题，升级到 Umi 4 后就没了",
+      "majorVersion": 3
+    },
+    {
+      "text": "如果要支持低版本浏览器，可尝试新出的 legacy 配置项",
+      "url": "https://umijs.org/docs/api/config#legacy",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果想点击组件跳转至编辑器源码位置，可尝试新出的 clickToComponent 配置项",
+      "url": "https://umijs.org/docs/api/config#clicktocomponent",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果想检测未使用的文件和导出，可尝试新出的 deadCode 配置项",
+      "url": "https://umijs.org/docs/api/config#deadcode",
+      "majorVersion": 4
+    },
+    {
+      "text": "默认使用 esbuild 作为 JavaScript 压缩工具，也可通过 jsMinifier 配置项切换到 terser 或 uglifyJs 等",
+      "url": "https://umijs.org/docs/api/config#jsminifier-webpack",
+      "majorVersion": 4
+    },
+    {
+      "text": "%%frameworkCliName%% g tsconfig 可一键完成项目的 TypeScript 配置",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果你有 MPA（多页应用）需求，可尝试新出的 mpa 配置项",
+      "url": "https://umijs.org/docs/guides/mpa",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果你需要使用 Jest 来测试 Umi 项目, %%frameworkCliName%% g jest 就可以一键完成配置",
+      "url": "https://umijs.org/docs/guides/generator#jest-%E9%85%8D%E7%BD%AE%E7%94%9F%E6%88%90%E5%99%A8",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果你需要使用 Tailwind CSS, %%frameworkCliName%% g tailwindcss 就可以一键完成配置",
+      "url": "https://umijs.org/docs/guides/generator#tailwind-css-%E9%85%8D%E7%BD%AE%E7%94%9F%E6%88%90%E5%99%A8",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果你需要使用 Prettier, %%frameworkCliName%% g prettier 就可以一键完成配置",
+      "url": "https://umijs.org/docs/guides/generator#prettier-%E9%85%8D%E7%BD%AE%E7%94%9F%E6%88%90%E5%99%A8",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果你需要使用 DvaJS 来作为状态管理库, %%frameworkCliName%% g dva 就可以一键完成配置",
+      "url": "https://umijs.org/docs/guides/generator#prettier-%E9%85%8D%E7%BD%AE%E7%94%9F%E6%88%90%E5%99%A8",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果你需要增加 Git 提交消息校验和自动代码格式化, %%frameworkCliName%% g precommit 就可以一键完成配置",
+      "url": "https://umijs.org/docs/guides/generator#precommit-%E9%85%8D%E7%BD%AE%E7%94%9F%E6%88%90%E5%99%A8",
+      "majorVersion": 4
+    },
+    {
+      "text": "%%frameworkCliName%% g page 可以快速生成页面模板",
+      "url": "https://umijs.org/docs/guides/generator#%E9%A1%B5%E9%9D%A2%E7%94%9F%E6%88%90%E5%99%A8",
+      "majorVersion": 4
+    },
+    {
+      "text": "%%frameworkCliName%% g component 可以快速生成组件模板",
+      "url": "https://umijs.org/docs/guides/generator#%E7%BB%84%E4%BB%B6%E7%94%9F%E6%88%90%E5%99%A8",
+      "majorVersion": 4
+    },
+    {
+      "text": "HMR=none %%frameworkCliName%% dev 可以关闭 Umi 开发服务器的模块热替换功能",
+      "majorVersion": 4
+    },
+    {
+      "text": "PORT=9000 %%frameworkCliName%% dev 可以指定 Umi 开发服务器的端口",
+      "majorVersion": 4
+    },
+    {
+      "text": "COMPRESS=none %%frameworkCliName%% build 可以关闭项目构建时的代码压缩功能, 方便调试项目的构建产物",
+      "majorVersion": 4
+    },
+    {
+      "text": "编写 src/loading.(jsx|tsx) 可以自定义页面的加载动画",
+      "majorVersion": 4
+    },
+    {
+      "text": "你知道可以通过 UMI_ENV 定义多个环境的配置吗",
+      "url": "https://umijs.org/docs/guides/env-variables#umi_env",
+      "majorVersion": 4
+    },
+    {
+      "text": "想快速修改 html 模板、DIY 项目？试试编写项目级插件",
+      "url": "https://umijs.org/docs/guides/directory-structure#plugints",
+      "majorVersion": 4
+    },
+    {
+      "text": "ANALYZE=1 %%frameworkCliName%% build 可以分析产物的源码构成",
+      "majorVersion": 4
+    },
+    {
+      "text": "如果想预览构建后产物, 可尝试 %%frameworkCliName%% preview",
+      "url": "https://umijs.org/docs/api/commands#preview",
+      "majorVersion": 4
+    }
+  ]
+}
