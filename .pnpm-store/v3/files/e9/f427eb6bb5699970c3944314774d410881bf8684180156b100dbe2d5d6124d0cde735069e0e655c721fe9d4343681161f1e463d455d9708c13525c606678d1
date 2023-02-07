@@ -1,0 +1,31 @@
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+import { Link, useLocation, useNavData } from 'dumi';
+import NavbarExtra from "dumi/theme/slots/NavbarExtra";
+import React from 'react';
+import "./index.less";
+
+var Navbar = function Navbar() {
+  var nav = useNavData();
+
+  var _useLocation = useLocation(),
+      pathname = _useLocation.pathname;
+
+  return /*#__PURE__*/React.createElement("ul", {
+    className: "dumi-default-navbar"
+  }, nav.map(function (item) {
+    return /*#__PURE__*/React.createElement("li", {
+      key: item.link
+    }, /^(\w+:)\/\/|^(mailto|tel):/.test(item.link) ? /*#__PURE__*/React.createElement("a", {
+      href: item.link,
+      target: "_blank",
+      rel: "noreferrer"
+    }, item.title) : /*#__PURE__*/React.createElement(Link, _extends({
+      to: item.link
+    }, pathname.startsWith(item.activePath || item.link) ? {
+      className: 'active'
+    } : {}), item.title));
+  }), /*#__PURE__*/React.createElement(NavbarExtra, null));
+};
+
+export default Navbar;
