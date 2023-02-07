@@ -1,0 +1,50 @@
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/features/sideEffects/docSideEffectsWebpackPlugin.ts
+var docSideEffectsWebpackPlugin_exports = {};
+__export(docSideEffectsWebpackPlugin_exports, {
+  default: () => docSideEffectsWebpackPlugin
+});
+module.exports = __toCommonJS(docSideEffectsWebpackPlugin_exports);
+var import_path = __toESM(require("path"));
+var docSideEffectsWebpackPlugin = class {
+  constructor(opts) {
+    this.opts = opts;
+  }
+  apply(compiler) {
+    compiler.hooks.normalModuleFactory.tap(this.constructor.name, (normalModuleFactory) => {
+      normalModuleFactory.hooks.afterResolve.tap(this.constructor.name, (data) => {
+        var _a;
+        const createData = data.createData || data;
+        const resourceResolveData = createData.resourceResolveData;
+        const sideEffectsFlag = (_a = resourceResolveData == null ? void 0 : resourceResolveData.descriptionFileData) == null ? void 0 : _a.sideEffects;
+        if (resourceResolveData && (sideEffectsFlag === false || Array.isArray(sideEffectsFlag)) && import_path.default.normalize(resourceResolveData.descriptionFilePath) === this.opts.pkgPath) {
+          const list = new Set(sideEffectsFlag || []);
+          this.opts.sideEffects.forEach((item) => list.add(item));
+          resourceResolveData.descriptionFileData.sideEffects = Array.from(list);
+        }
+      });
+    });
+  }
+};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {});

@@ -1,0 +1,8 @@
+import React from 'react';
+import type { AppsLogoComponentsAppList, AppsLogoComponentsAppItem } from './types';
+export declare const DefaultContent: React.FC<{
+    appList?: AppsLogoComponentsAppList;
+    itemClick?: (item: AppsLogoComponentsAppItem) => void;
+    baseClassName: string;
+    hashId?: string;
+}>;
