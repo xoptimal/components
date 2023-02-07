@@ -1,9 +1,0 @@
-import { type Language } from 'prism-react-renderer';
-import 'prism-themes/themes/prism-one-light.css';
-import { type FC } from 'react';
-import './index.less';
-declare const SourceCode: FC<{
-    children: string;
-    lang: Language;
-}>;
-export default SourceCode;
