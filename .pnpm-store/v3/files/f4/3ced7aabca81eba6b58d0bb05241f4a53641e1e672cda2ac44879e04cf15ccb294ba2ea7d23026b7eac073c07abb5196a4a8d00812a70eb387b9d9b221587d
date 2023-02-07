@@ -1,0 +1,228 @@
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/features/theme/index.ts
+var theme_exports = {};
+__export(theme_exports, {
+  default: () => theme_default
+});
+module.exports = __toCommonJS(theme_exports);
+var import_constants = require("../../constants");
+var import_bundler_utils = require("@umijs/bundler-utils");
+var import_fs = __toESM(require("fs"));
+var import_path = __toESM(require("path"));
+var import_plugin_utils = require("umi/plugin-utils");
+var import_derivative = require("../derivative");
+var import_loader = __toESM(require("./loader"));
+var DEFAULT_THEME_PATH = import_path.default.join(__dirname, "../../../theme-default");
+function getPkgThemeName(api) {
+  const validDeps = Object.assign({}, api.pkg.dependencies, api.pkg.devDependencies);
+  const pkgThemeName = Object.keys(validDeps).find((pkg) => pkg.split("/").pop().startsWith(import_constants.THEME_PREFIX));
+  return pkgThemeName;
+}
+function getPkgThemePath(api) {
+  const pkgThemeName = getPkgThemeName(api);
+  return pkgThemeName && import_path.default.dirname(require.resolve(`${pkgThemeName}/package.json`, { paths: [api.cwd] }));
+}
+function getModuleExports(modulePath) {
+  return (0, import_bundler_utils.parseModuleSync)({
+    path: modulePath,
+    content: import_fs.default.readFileSync(modulePath, "utf-8")
+  })[1];
+}
+var theme_default = (api) => {
+  const defaultThemeData = (0, import_loader.default)(DEFAULT_THEME_PATH);
+  const pkgThemePath = getPkgThemePath(api);
+  const pkgThemeData = (0, import_plugin_utils.deepmerge)(defaultThemeData, pkgThemePath ? (0, import_loader.default)(import_path.default.join(pkgThemePath, "dist")) : {});
+  const localThemePath = import_path.default.join(api.cwd, import_constants.LOCAL_THEME_DIR);
+  const localThemeData = import_fs.default.existsSync(localThemePath) ? (0, import_loader.default)(localThemePath) : void 0;
+  const themeMapKeys = [
+    "layouts",
+    "builtins",
+    "slots"
+  ];
+  let originalThemeData;
+  api.describe({ key: "dumi:theme" });
+  [pkgThemeData.plugin, localThemeData == null ? void 0 : localThemeData.plugin].forEach((plugin) => {
+    if (plugin) {
+      api.registerPlugins([plugin]);
+    }
+  });
+  (0, import_derivative.safeExcludeInMFSU)(api, [
+    "dumi/theme-default",
+    "@ant-design/icons-svg",
+    getPkgThemeName(api)
+  ].filter(Boolean).map((pkg) => new RegExp(pkg)));
+  api.register({
+    key: "modifyAppData",
+    before: "appData",
+    async fn(memo) {
+      originalThemeData = await api.applyPlugins({
+        key: "modifyTheme",
+        initialValue: pkgThemeData
+      });
+      api.service.themeData = originalThemeData;
+      if (localThemeData) {
+        api.service.themeData = (0, import_plugin_utils.deepmerge)(originalThemeData, localThemeData, {
+          clone: true
+        });
+      }
+      Object.assign(api.service.themeData.builtins, {
+        DumiDemo: {
+          specifier: "{ DumiDemo }",
+          source: "dumi"
+        },
+        DumiDemoGrid: {
+          specifier: "{ DumiDemoGrid }",
+          source: "dumi"
+        },
+        Link: {
+          specifier: "{ Link }",
+          source: "dumi"
+        }
+      });
+      return memo;
+    }
+  });
+  api.modifyConfig((memo) => {
+    if (localThemeData) {
+      themeMapKeys.forEach((key) => {
+        Object.values(localThemeData[key] || {}).forEach((item) => {
+          memo.alias[`dumi/theme/${key}/${item.specifier}`] = item.source;
+        });
+      });
+    }
+    memo.alias["dumi/theme"] = "dumi/theme-original";
+    memo.alias["dumi/theme-original"] = import_path.default.join(api.paths.absTmpPath, "dumi/theme");
+    memo.alias["dumi/theme-default"] = DEFAULT_THEME_PATH;
+    memo.extraBabelIncludes ?? (memo.extraBabelIncludes = []);
+    memo.extraBabelIncludes.push(import_path.default.resolve(__dirname, "../../client/theme-api"));
+    memo.theme ?? (memo.theme = {});
+    memo.theme["dark-selector"] = `~'[${import_constants.PREFERS_COLOR_ATTR}="dark"]'`;
+    return memo;
+  });
+  api.onGenerateFiles(() => {
+    themeMapKeys.forEach((key) => {
+      Object.values(originalThemeData[key] || {}).forEach((item) => {
+        if (item.source === "dumi")
+          return;
+        let contents = [];
+        const exports = getModuleExports(item.source);
+        if (exports.includes("default")) {
+          contents.push(`export { default } from '${item.source}';`);
+        }
+        if (exports.some((exp) => exp !== "default")) {
+          contents.push(`export * from '${item.source}';`);
+        }
+        api.writeTmpFile({
+          noPluginDir: true,
+          path: `dumi/theme/${key}/${item.specifier}.ts`,
+          content: contents.join("\n")
+        });
+      });
+    });
+    const entryFile = api.config.resolve.entryFile && [import_path.default.resolve(api.cwd, api.config.resolve.entryFile)].find(import_fs.default.existsSync);
+    const entryExports = entryFile ? getModuleExports(entryFile) : [];
+    const hasDefaultExport = entryExports.includes("default");
+    const hasNamedExport = entryExports.some((exp) => exp !== "default");
+    api.writeTmpFile({
+      noPluginDir: true,
+      path: "dumi/theme/ContextWrapper.tsx",
+      content: `import React, { useState, useEffect, useRef } from 'react';
+import { useOutlet, history } from 'dumi';
+import { SiteContext } from '${(0, import_plugin_utils.winPath)(require.resolve("../../client/theme-api/context"))}';
+import { demos, components } from '../meta';
+import { locales } from '../locales/config';${hasDefaultExport ? `
+import entryDefaultExport from '${(0, import_plugin_utils.winPath)(entryFile)}';` : ""}${hasNamedExport ? `
+import * as entryMemberExports from '${(0, import_plugin_utils.winPath)(entryFile)}';` : ""}
+
+const entryExports = {
+  ${hasDefaultExport ? "default: entryDefaultExport," : ""}
+  ${hasNamedExport ? "...entryMemberExports," : ""}
+};
+
+export default function DumiContextWrapper() {
+  const outlet = useOutlet();
+  const [loading, setLoading] = useState(true);
+  const prev = useRef(history.location.pathname);
+
+  useEffect(() => {
+    return history.listen((next) => {
+      if (next.location.pathname !== prev.current) {
+        prev.current = next.location.pathname;
+
+        // mark loading when route change, page component will set false when loaded
+        setLoading(true);
+
+        // scroll to top when route changed
+        document.documentElement.scrollTo(0, 0);
+      }
+    });
+  }, []);
+
+  return (
+    <SiteContext.Provider value={{
+      pkg: ${JSON.stringify(import_plugin_utils.lodash.pick(api.pkg, ...Object.keys(import_constants.PICKED_PKG_FIELDS)))},
+      entryExports,
+      demos,
+      components,
+      locales,
+      loading,
+      setLoading,
+      themeConfig: ${JSON.stringify(Object.assign(import_plugin_utils.lodash.pick(api.config, "logo", "description", "title"), api.config.themeConfig))},
+    }}>
+      {outlet}
+    </SiteContext.Provider>
+  );
+}`
+    });
+  });
+  api.addEntryCodeAhead(() => {
+    const { prefersColor } = api.config.themeConfig;
+    if (prefersColor.switch === false && prefersColor.default !== "auto") {
+      return `document.documentElement.setAttribute('${import_constants.PREFERS_COLOR_ATTR}', '${prefersColor.default}');`;
+    }
+    return `(function () {
+  var cache = typeof navigator !== 'undefined' && navigator.cookieEnabled && typeof window.localStorage !== 'undefined' && localStorage.getItem('dumi:prefers-color') || '${prefersColor.default}';
+  var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var enums = ['light', 'dark', 'auto'];
+
+  document.documentElement.setAttribute(
+    '${import_constants.PREFERS_COLOR_ATTR}',
+    cache === enums[2]
+      ? (isDark ? enums[1] : enums[0])
+      : (enums.indexOf(cache) > -1 ? cache : enums[0])
+  );
+})();`;
+  });
+  if (require("@umijs/core/package").__npminstall_done && import_fs.default.existsSync(localThemePath) && import_fs.default.lstatSync(localThemePath).isSymbolicLink()) {
+    api.chainWebpack((memo) => {
+      const devThemeNodeModules = import_path.default.join(api.cwd, "../node_modules");
+      memo.snapshot((0, import_plugin_utils.deepmerge)(memo.get("snapshot"), {
+        immutablePaths: [devThemeNodeModules],
+        managedPaths: [devThemeNodeModules]
+      }));
+      return memo;
+    });
+  }
+};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {});

@@ -1,0 +1,102 @@
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+import { useAppData, useIntl, useSiteData } from 'dumi';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useLocale } from "./useLocale";
+export var useLocaleDocRoutes = function useLocaleDocRoutes() {
+  var intl = useIntl();
+
+  var _useAppData = useAppData(),
+      routes = _useAppData.routes;
+
+  var _useSiteData = useSiteData(),
+      locales = _useSiteData.locales;
+
+  var _useState = useState(function () {
+    var reversedLocales = locales.slice().reverse();
+    return Object.values(routes).reduce(function (ret, route) {
+      var matched = reversedLocales.find(function (locale) {
+        return 'suffix' in locale ? // suffix mode
+        route.path.endsWith(locale.suffix) : // base mode
+        route.path.startsWith(locale.base.slice(1));
+      });
+
+      if (route.parentId === 'DocLayout' && matched.id === intl.locale) {
+        ret[route.id] = route;
+      }
+
+      return ret;
+    }, {});
+  }),
+      _useState2 = _slicedToArray(_useState, 1),
+      localeDocRoutes = _useState2[0];
+
+  return localeDocRoutes;
+};
+/**
+ * 在 react 18 中需要新的 render 方式，这个函数用来处理不同的 jsx 模式。
+ * @param version react version
+ * @returns code string
+ */
+
+export var genReactRenderCode = function genReactRenderCode(version) {
+  var annotation = "/**\n * This is an auto-generated demo by dumi\n * if you think it is not working as expected,\n * please report the issue at\n * https://github.com/umijs/dumi/issues\n */";
+
+  if (version.startsWith('18.') || version === 'latest') {
+    return "".concat(annotation, "\n\nimport React from 'react';\nimport { createRoot } from \"react-dom/client\";\nimport App from \"./App\";\n\nconst rootElement = document.getElementById(\"root\");\nconst root = createRoot(rootElement);\n\nroot.render(<App />);");
+  }
+
+  return "".concat(annotation, "\n\nimport React from 'react';\nimport ReactDOM from 'react-dom';\nimport App from './App';\n\nReactDOM.render(\n  <App />,\n  document.getElementById('root'),\n);");
+};
+export var useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+/**
+ * common comparer for sidebar/nav items
+ */
+
+export var useRouteDataComparer = function useRouteDataComparer() {
+  var locale = useLocale();
+  return useCallback(function (a, b) {
+    return (// smaller before larger for all
+      ('order' in a && 'order' in b ? a.order - b.order : 0) || ( // shallower before deeper for sidebar item
+      'link' in a && 'link' in b ? a.link.split('/').length - b.link.split('/').length : 0) || ( // shallower before deeper for sidebar leaf
+      'path' in a && 'path' in b ? a.path.split('/').length - b.path.split('/').length : 0) || ( // fallback to compare title (put non-title item at the end)
+      a.title ? a.title.localeCompare(b.title || '', locale.id) : -1)
+    );
+  }, []);
+};
+/**
+ * common util for pick meta to sort sidebar/nav items
+ */
+
+export var pickRouteSortMeta = function pickRouteSortMeta(original, field, fm) {
+  var _sub$order;
+
+  var sub = fm[field];
+
+  switch (_typeof(sub)) {
+    case 'object':
+      original.title = sub.title || original.title;
+      original.order = (_sub$order = sub.order) !== null && _sub$order !== void 0 ? _sub$order : original.order;
+      break;
+
+    case 'string':
+      original.title = sub || original.title;
+      break;
+
+    default:
+  }
+
+  return original;
+};

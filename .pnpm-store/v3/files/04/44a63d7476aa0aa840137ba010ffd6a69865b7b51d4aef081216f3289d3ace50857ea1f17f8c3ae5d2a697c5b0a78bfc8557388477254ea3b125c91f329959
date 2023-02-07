@@ -1,0 +1,424 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault").default;
+var _interopRequireWildcard = require("@babel/runtime/helpers/interopRequireWildcard").default;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var _exportNames = {
+  createIntl: true,
+  mnMNIntl: true,
+  arEGIntl: true,
+  enUSIntl: true,
+  enGBIntl: true,
+  zhCNIntl: true,
+  viVNIntl: true,
+  itITIntl: true,
+  jaJPIntl: true,
+  esESIntl: true,
+  caESIntl: true,
+  ruRUIntl: true,
+  srRSIntl: true,
+  msMYIntl: true,
+  zhTWIntl: true,
+  frFRIntl: true,
+  ptBRIntl: true,
+  koKRIntl: true,
+  idIDIntl: true,
+  deDEIntl: true,
+  faIRIntl: true,
+  trTRIntl: true,
+  plPLIntl: true,
+  hrHRIntl: true,
+  intlMap: true,
+  intlMapKeys: true,
+  ConfigConsumer: true,
+  ProConfigProvider: true,
+  useIntl: true,
+  ProProvider: true
+};
+exports.trTRIntl = exports.srRSIntl = exports.ruRUIntl = exports.ptBRIntl = exports.plPLIntl = exports.msMYIntl = exports.mnMNIntl = exports.koKRIntl = exports.jaJPIntl = exports.itITIntl = exports.intlMapKeys = exports.intlMap = exports.idIDIntl = exports.hrHRIntl = exports.frFRIntl = exports.faIRIntl = exports.esESIntl = exports.enUSIntl = exports.enGBIntl = exports.default = exports.deDEIntl = exports.createIntl = exports.caESIntl = exports.arEGIntl = exports.ProProvider = exports.ProConfigProvider = exports.ConfigConsumer = void 0;
+exports.useIntl = useIntl;
+exports.zhTWIntl = exports.zhCNIntl = exports.viVNIntl = void 0;
+var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
+var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
+var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
+var _objectSpread2 = _interopRequireDefault(require("@babel/runtime/helpers/objectSpread2"));
+var _createForOfIteratorHelper2 = _interopRequireDefault(require("@babel/runtime/helpers/createForOfIteratorHelper"));
+var _jsxRuntime = require("react/jsx-runtime");
+var _cssinjs = require("@ant-design/cssinjs");
+var _antd = require("antd");
+var _zh_CN = _interopRequireDefault(require("antd/lib/locale/zh_CN"));
+var _react = _interopRequireWildcard(require("react"));
+var _swr = require("swr");
+var _ar_EG = _interopRequireDefault(require("./locale/ar_EG"));
+var _ca_ES = _interopRequireDefault(require("./locale/ca_ES"));
+var _de_DE = _interopRequireDefault(require("./locale/de_DE"));
+var _en_GB = _interopRequireDefault(require("./locale/en_GB"));
+var _en_US = _interopRequireDefault(require("./locale/en_US"));
+var _es_ES = _interopRequireDefault(require("./locale/es_ES"));
+var _fa_IR = _interopRequireDefault(require("./locale/fa_IR"));
+var _fr_FR = _interopRequireDefault(require("./locale/fr_FR"));
+var _hr_HR = _interopRequireDefault(require("./locale/hr_HR"));
+var _id_ID = _interopRequireDefault(require("./locale/id_ID"));
+var _it_IT = _interopRequireDefault(require("./locale/it_IT"));
+var _ja_JP = _interopRequireDefault(require("./locale/ja_JP"));
+var _ko_KR = _interopRequireDefault(require("./locale/ko_KR"));
+var _mn_MN = _interopRequireDefault(require("./locale/mn_MN"));
+var _ms_MY = _interopRequireDefault(require("./locale/ms_MY"));
+var _pl_PL = _interopRequireDefault(require("./locale/pl_PL"));
+var _pt_BR = _interopRequireDefault(require("./locale/pt_BR"));
+var _ru_RU = _interopRequireDefault(require("./locale/ru_RU"));
+var _sr_RS = _interopRequireDefault(require("./locale/sr_RS"));
+var _tr_TR = _interopRequireDefault(require("./locale/tr_TR"));
+var _vi_VN = _interopRequireDefault(require("./locale/vi_VN"));
+var _zh_CN2 = _interopRequireDefault(require("./locale/zh_CN"));
+var _zh_TW = _interopRequireDefault(require("./locale/zh_TW"));
+var _layoutToken = require("./typing/layoutToken");
+var _useStyle = require("./useStyle");
+Object.keys(_useStyle).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  if (key in exports && exports[key] === _useStyle[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _useStyle[key];
+    }
+  });
+});
+var _token = require("./useStyle/token");
+var _merge = require("./utils/merge");
+var _excluded = ["locale", "getPrefixCls"],
+  _excluded2 = ["locale", "theme"];
+/**
+ * 安全的从一个对象中读取相应的值
+ * @param source
+ * @param path
+ * @param defaultValue
+ * @returns
+ */
+function get(source, path, defaultValue) {
+  // a[3].b -> a.3.b
+  var paths = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+  var result = source;
+  var message = defaultValue;
+  // eslint-disable-next-line no-restricted-syntax
+  var _iterator = (0, _createForOfIteratorHelper2.default)(paths),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var p = _step.value;
+      message = Object(result)[p];
+      result = Object(result)[p];
+      if (message === undefined) {
+        return defaultValue;
+      }
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+  return message;
+}
+/**
+ * 创建一个国际化的操作函数
+ *
+ * @param locale
+ * @param localeMap
+ */
+var createIntl = function createIntl(locale, localeMap) {
+  return {
+    getMessage: function getMessage(id, defaultMessage) {
+      return get(localeMap, id, defaultMessage) || defaultMessage;
+    },
+    locale: locale
+  };
+};
+exports.createIntl = createIntl;
+var mnMNIntl = createIntl('mn_MN', _mn_MN.default);
+exports.mnMNIntl = mnMNIntl;
+var arEGIntl = createIntl('ar_EG', _ar_EG.default);
+exports.arEGIntl = arEGIntl;
+var zhCNIntl = createIntl('zh_CN', _zh_CN2.default);
+exports.zhCNIntl = zhCNIntl;
+var enUSIntl = createIntl('en_US', _en_US.default);
+exports.enUSIntl = enUSIntl;
+var enGBIntl = createIntl('en_GB', _en_GB.default);
+exports.enGBIntl = enGBIntl;
+var viVNIntl = createIntl('vi_VN', _vi_VN.default);
+exports.viVNIntl = viVNIntl;
+var itITIntl = createIntl('it_IT', _it_IT.default);
+exports.itITIntl = itITIntl;
+var jaJPIntl = createIntl('ja_JP', _ja_JP.default);
+exports.jaJPIntl = jaJPIntl;
+var esESIntl = createIntl('es_ES', _es_ES.default);
+exports.esESIntl = esESIntl;
+var caESIntl = createIntl('ca_ES', _ca_ES.default);
+exports.caESIntl = caESIntl;
+var ruRUIntl = createIntl('ru_RU', _ru_RU.default);
+exports.ruRUIntl = ruRUIntl;
+var srRSIntl = createIntl('sr_RS', _sr_RS.default);
+exports.srRSIntl = srRSIntl;
+var msMYIntl = createIntl('ms_MY', _ms_MY.default);
+exports.msMYIntl = msMYIntl;
+var zhTWIntl = createIntl('zh_TW', _zh_TW.default);
+exports.zhTWIntl = zhTWIntl;
+var frFRIntl = createIntl('fr_FR', _fr_FR.default);
+exports.frFRIntl = frFRIntl;
+var ptBRIntl = createIntl('pt_BR', _pt_BR.default);
+exports.ptBRIntl = ptBRIntl;
+var koKRIntl = createIntl('ko_KR', _ko_KR.default);
+exports.koKRIntl = koKRIntl;
+var idIDIntl = createIntl('id_ID', _id_ID.default);
+exports.idIDIntl = idIDIntl;
+var deDEIntl = createIntl('de_DE', _de_DE.default);
+exports.deDEIntl = deDEIntl;
+var faIRIntl = createIntl('fa_IR', _fa_IR.default);
+exports.faIRIntl = faIRIntl;
+var trTRIntl = createIntl('tr_TR', _tr_TR.default);
+exports.trTRIntl = trTRIntl;
+var plPLIntl = createIntl('pl_PL', _pl_PL.default);
+exports.plPLIntl = plPLIntl;
+var hrHRIntl = createIntl('hr_', _hr_HR.default);
+exports.hrHRIntl = hrHRIntl;
+var intlMap = {
+  'mn-MN': mnMNIntl,
+  'ar-EG': arEGIntl,
+  'zh-CN': zhCNIntl,
+  'en-US': enUSIntl,
+  'en-GB': enGBIntl,
+  'vi-VN': viVNIntl,
+  'it-IT': itITIntl,
+  'ja-JP': jaJPIntl,
+  'es-ES': esESIntl,
+  'ca-ES': caESIntl,
+  'ru-RU': ruRUIntl,
+  'sr-RS': srRSIntl,
+  'ms-MY': msMYIntl,
+  'zh-TW': zhTWIntl,
+  'fr-FR': frFRIntl,
+  'pt-BR': ptBRIntl,
+  'ko-KR': koKRIntl,
+  'id-ID': idIDIntl,
+  'de-DE': deDEIntl,
+  'fa-IR': faIRIntl,
+  'tr-TR': trTRIntl,
+  'pl-PL': plPLIntl,
+  'hr-HR': hrHRIntl
+};
+exports.intlMap = intlMap;
+var intlMapKeys = Object.keys(intlMap);
+exports.intlMapKeys = intlMapKeys;
+/* Creating a context object with the default values. */
+var ProConfigContext = /*#__PURE__*/_react.default.createContext({
+  intl: (0, _objectSpread2.default)((0, _objectSpread2.default)({}, zhCNIntl), {}, {
+    locale: 'default'
+  }),
+  valueTypeMap: {},
+  theme: _token.emptyTheme,
+  hashed: true,
+  dark: false,
+  token: _token.defaultToken
+});
+var ConfigConsumer = ProConfigContext.Consumer;
+/**
+ * 根据 antd 的 key 来找到的 locale 插件的 key
+ *
+ * @param localeKey
+ */
+exports.ConfigConsumer = ConfigConsumer;
+var findIntlKeyByAntdLocaleKey = function findIntlKeyByAntdLocaleKey(localeKey) {
+  if (!localeKey) {
+    return 'zh-CN';
+  }
+  var localeName = localeKey.toLocaleLowerCase();
+  return intlMapKeys.find(function (intlKey) {
+    var LowerCaseKey = intlKey.toLocaleLowerCase();
+    return LowerCaseKey.includes(localeName);
+  });
+};
+/**
+ * 组件解除挂载后清空一下 cache
+ * @date 2022-11-28
+ * @returns null
+ */
+var CacheClean = function CacheClean() {
+  var _useSWRConfig = (0, _swr.useSWRConfig)(),
+    cache = _useSWRConfig.cache;
+  (0, _react.useEffect)(function () {
+    return function () {
+      // is a map
+      // @ts-ignore
+      cache.clear();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+};
+var ConfigProVidContainer = function ConfigProVidContainer(props) {
+  var _proTheme$useToken;
+  var children = props.children,
+    dark = props.dark,
+    valueTypeMap = props.valueTypeMap,
+    _props$autoClearCache = props.autoClearCache,
+    autoClearCache = _props$autoClearCache === void 0 ? false : _props$autoClearCache,
+    propsToken = props.token,
+    prefixCls = props.prefixCls;
+  var _useContext = (0, _react.useContext)(_antd.ConfigProvider.ConfigContext),
+    locale = _useContext.locale,
+    getPrefixCls = _useContext.getPrefixCls,
+    restConfig = (0, _objectWithoutProperties2.default)(_useContext, _excluded);
+  var tokenContext = (_proTheme$useToken = _useStyle.proTheme.useToken) === null || _proTheme$useToken === void 0 ? void 0 : _proTheme$useToken.call(_useStyle.proTheme);
+  var containerDomRef = (0, _react.useRef)(null);
+  var proProvide = (0, _react.useContext)(ProConfigContext);
+  /**
+   * pro 的 类
+   * @type {string}
+   * @example .ant-pro
+   */
+  var proComponentsCls = prefixCls ? ".".concat(prefixCls) : ".".concat(getPrefixCls(), "-pro");
+  var antCls = '.' + getPrefixCls();
+  var salt = "".concat(proComponentsCls);
+  /**
+   * 合并一下token，不然导致嵌套 token 失效
+   */
+  var proLayoutTokenMerge = (0, _react.useMemo)(function () {
+    return (0, _layoutToken.getLayoutDesignToken)(propsToken || {}, tokenContext.token || _token.defaultToken);
+  }, [propsToken, tokenContext.token]);
+  var proProvideValue = (0, _react.useMemo)(function () {
+    var _proProvide$intl;
+    var localeName = locale === null || locale === void 0 ? void 0 : locale.locale;
+    var key = findIntlKeyByAntdLocaleKey(localeName);
+    // antd 的 key 存在的时候以 antd 的为主
+    var intl = localeName && ((_proProvide$intl = proProvide.intl) === null || _proProvide$intl === void 0 ? void 0 : _proProvide$intl.locale) === 'default' ? intlMap[key] : proProvide.intl || intlMap[key];
+    return (0, _objectSpread2.default)((0, _objectSpread2.default)({}, proProvide), {}, {
+      dark: dark !== null && dark !== void 0 ? dark : proProvide.dark,
+      token: (0, _merge.merge)(proProvide.token, tokenContext.token, {
+        proComponentsCls: proComponentsCls,
+        antCls: antCls,
+        themeId: tokenContext.theme.id,
+        layout: proLayoutTokenMerge
+      }),
+      intl: intl || zhCNIntl
+    });
+  }, [locale === null || locale === void 0 ? void 0 : locale.locale, proProvide, dark, tokenContext.token, tokenContext.theme.id, proComponentsCls, antCls, proLayoutTokenMerge]);
+  var finalToken = (0, _objectSpread2.default)((0, _objectSpread2.default)({}, proProvideValue.token || {}), {}, {
+    proComponentsCls: proComponentsCls
+  });
+  var _useCacheToken = (0, _cssinjs.useCacheToken)(tokenContext.theme, [tokenContext.token, finalToken !== null && finalToken !== void 0 ? finalToken : {}], {
+      salt: salt
+    }),
+    _useCacheToken2 = (0, _slicedToArray2.default)(_useCacheToken, 2),
+    token = _useCacheToken2[0],
+    nativeHashId = _useCacheToken2[1];
+  var hashId = (0, _react.useMemo)(function () {
+    var _process$env$NODE_ENV;
+    if (props.hashed === false) {
+      return '';
+    }
+    if (proProvide.hashed === false) return '';
+    if (((_process$env$NODE_ENV = process.env.NODE_ENV) === null || _process$env$NODE_ENV === void 0 ? void 0 : _process$env$NODE_ENV.toLowerCase()) !== 'test') return nativeHashId;
+    return '';
+  }, [nativeHashId, proProvide.hashed, props.hashed]);
+  var configProviderDom = (0, _react.useMemo)(function () {
+    var _process$env$NODE_ENV2;
+    var themeConfig = (0, _objectSpread2.default)((0, _objectSpread2.default)({}, restConfig.theme), {}, {
+      hashId: hashId,
+      hashed: ((_process$env$NODE_ENV2 = process.env.NODE_ENV) === null || _process$env$NODE_ENV2 === void 0 ? void 0 : _process$env$NODE_ENV2.toLowerCase()) !== 'test' && props.hashed !== false && proProvide.hashed !== false
+    });
+    var provide = (0, _jsxRuntime.jsx)(_antd.ConfigProvider, (0, _objectSpread2.default)((0, _objectSpread2.default)({}, restConfig), {}, {
+      theme: (0, _objectSpread2.default)({}, themeConfig),
+      children: (0, _jsxRuntime.jsx)(ProConfigContext.Provider, {
+        value: (0, _objectSpread2.default)((0, _objectSpread2.default)({}, proProvideValue), {}, {
+          valueTypeMap: valueTypeMap || (proProvideValue === null || proProvideValue === void 0 ? void 0 : proProvideValue.valueTypeMap),
+          token: token,
+          containerDomRef: containerDomRef,
+          theme: tokenContext.theme,
+          hashed: props.hashed,
+          hashId: hashId
+        }),
+        children: (0, _jsxRuntime.jsxs)(_jsxRuntime.Fragment, {
+          children: [autoClearCache && (0, _jsxRuntime.jsx)(CacheClean, {}), children]
+        })
+      })
+    }));
+    return (0, _jsxRuntime.jsx)("div", {
+      ref: containerDomRef,
+      className: "".concat(prefixCls || (getPrefixCls === null || getPrefixCls === void 0 ? void 0 : getPrefixCls('pro')) || 'ant-pro').concat(hashId ? ' ' + hashId : ''),
+      children: provide
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoClearCache, children, getPrefixCls, hashId, locale, proProvideValue, token]);
+  if (!autoClearCache) return configProviderDom;
+  return (0, _jsxRuntime.jsx)(_swr.SWRConfig, {
+    value: {
+      provider: function provider() {
+        return new Map();
+      }
+    },
+    children: configProviderDom
+  });
+};
+var ProConfigProvider = function ProConfigProvider(props) {
+  var needDeps = props.needDeps,
+    dark = props.dark,
+    token = props.token;
+  var proProvide = (0, _react.useContext)(ProConfigContext);
+  var _useContext2 = (0, _react.useContext)(_antd.ConfigProvider.ConfigContext),
+    locale = _useContext2.locale,
+    theme = _useContext2.theme,
+    rest = (0, _objectWithoutProperties2.default)(_useContext2, _excluded2);
+  // 是不是不需要渲染 provide
+  var isNullProvide = needDeps && proProvide.hashId !== undefined && Object.keys(props).sort().join('-') === 'children-needDeps';
+  if (isNullProvide) return (0, _jsxRuntime.jsx)(_jsxRuntime.Fragment, {
+    children: props.children
+  });
+  var mergeAlgorithm = function mergeAlgorithm() {
+    var isDark = dark !== null && dark !== void 0 ? dark : proProvide.dark;
+    if (isDark && !Array.isArray(theme === null || theme === void 0 ? void 0 : theme.algorithm)) {
+      return [_useStyle.proTheme.darkAlgorithm, theme === null || theme === void 0 ? void 0 : theme.algorithm].filter(Boolean);
+    }
+    if (isDark && Array.isArray(theme === null || theme === void 0 ? void 0 : theme.algorithm)) {
+      return [_useStyle.proTheme.darkAlgorithm].concat((0, _toConsumableArray2.default)((theme === null || theme === void 0 ? void 0 : theme.algorithm) || [])).filter(Boolean);
+    }
+    return theme === null || theme === void 0 ? void 0 : theme.algorithm;
+  };
+  // 自动注入 antd 的配置
+  var configProvider = (0, _objectSpread2.default)((0, _objectSpread2.default)({}, rest), {}, {
+    locale: locale || _zh_CN.default,
+    theme: (0, _objectSpread2.default)((0, _objectSpread2.default)({}, theme), {}, {
+      algorithm: mergeAlgorithm()
+    })
+  });
+  return (0, _jsxRuntime.jsx)(_antd.ConfigProvider, (0, _objectSpread2.default)((0, _objectSpread2.default)({}, configProvider), {}, {
+    children: (0, _jsxRuntime.jsx)(ConfigProVidContainer, (0, _objectSpread2.default)((0, _objectSpread2.default)({}, props), {}, {
+      token: token
+    }))
+  }));
+};
+/**
+ * It returns the intl object from the context if it exists, otherwise it returns the intl object for
+ * the current locale
+ * @returns The return value of the function is the intl object.
+ */
+exports.ProConfigProvider = ProConfigProvider;
+function useIntl() {
+  var _useContext3 = (0, _react.useContext)(_antd.ConfigProvider.ConfigContext),
+    locale = _useContext3.locale;
+  var _useContext4 = (0, _react.useContext)(ProConfigContext),
+    intl = _useContext4.intl;
+  if (intl && intl.locale !== 'default') {
+    return intl || zhCNIntl;
+  }
+  if (locale === null || locale === void 0 ? void 0 : locale.locale) {
+    return intlMap[findIntlKeyByAntdLocaleKey(locale.locale)] || zhCNIntl;
+  }
+  return zhCNIntl;
+}
+var ProProvider = ProConfigContext;
+exports.ProProvider = ProProvider;
+ProProvider.displayName = 'ProProvider';
+var _default = ProConfigContext;
+exports.default = _default;

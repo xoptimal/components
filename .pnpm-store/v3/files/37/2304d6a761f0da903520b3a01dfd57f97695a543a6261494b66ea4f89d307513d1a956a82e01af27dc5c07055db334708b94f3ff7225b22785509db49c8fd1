@@ -1,0 +1,88 @@
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/features/parser.ts
+var parser_exports = {};
+__export(parser_exports, {
+  default: () => parser_default
+});
+module.exports = __toCommonJS(parser_exports);
+var import_assert = __toESM(require("assert"));
+var import_meta = require("./meta");
+var parser_default = (api) => {
+  let prevData;
+  const writeAtomsMetaFile = (data) => {
+    api.writeTmpFile({
+      noPluginDir: true,
+      path: import_meta.ATOMS_META_PATH,
+      content: `export const components = ${JSON.stringify(data.components, null, 2)};`
+    });
+  };
+  api.describe({
+    key: "apiParser",
+    enableBy: api.EnableBy.config,
+    config: {
+      schema: (Joi) => Joi.object({
+        unpkgHost: Joi.string().uri().optional(),
+        resolveFilter: Joi.function().optional()
+      })
+    }
+  });
+  api.modifyDefaultConfig((memo) => {
+    var _a;
+    (0, import_assert.default)((_a = api.userConfig.resolve) == null ? void 0 : _a.entryFile, "`resolve.entryFile` must be configured when `apiParser` enable");
+    return memo;
+  });
+  api.onCheckPkgJSON(async () => {
+    const {
+      default: AtomAssetsParser
+    } = require("../assetParsers/atom");
+    api.service.atomParser = new AtomAssetsParser({
+      entryFile: api.config.resolve.entryFile,
+      resolveDir: api.cwd,
+      unpkgHost: api.config.apiParser.unpkgHost,
+      resolveFilter: api.config.apiParser.resolveFilter
+    });
+  });
+  api.onDevCompileDone(({ isFirstCompile }) => {
+    if (isFirstCompile) {
+      api.service.atomParser.watch((data) => {
+        prevData = data;
+        writeAtomsMetaFile(prevData);
+      });
+    }
+  });
+  api.onGenerateFiles(async () => {
+    if (api.env === "production") {
+      writeAtomsMetaFile(await api.service.atomParser.parse());
+    } else if (prevData) {
+      writeAtomsMetaFile(prevData);
+    }
+  });
+  api.onBuildComplete({
+    stage: Infinity,
+    fn() {
+      api.service.atomParser.destroyWorker();
+    }
+  });
+};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {});
