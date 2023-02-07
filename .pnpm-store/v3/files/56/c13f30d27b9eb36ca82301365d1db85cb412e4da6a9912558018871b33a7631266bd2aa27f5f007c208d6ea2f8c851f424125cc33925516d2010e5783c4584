@@ -1,0 +1,68 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/features/exportStatic.ts
+var exportStatic_exports = {};
+__export(exportStatic_exports, {
+  default: () => exportStatic_default
+});
+module.exports = __toCommonJS(exportStatic_exports);
+var import_constants = require("../constants");
+var import_plugin_utils = require("umi/plugin-utils");
+var import_assets = require("./assets");
+var exportStatic_default = (api) => {
+  const prevExtraRoutePaths = [];
+  api.describe({ key: "dumi:exportStatic" });
+  api.register({
+    key: "modifyDefaultConfig",
+    stage: Infinity,
+    fn(memo) {
+      if (memo.exportStatic && memo.exportStatic.extraRoutePaths) {
+        prevExtraRoutePaths.push(memo.exportStatic.extraRoutePaths);
+      }
+    }
+  });
+  api.register({
+    key: "modifyConfig",
+    stage: Infinity,
+    fn(memo) {
+      var _a;
+      if (memo.exportStatic !== false) {
+        if ((_a = memo.exportStatic) == null ? void 0 : _a.extraRoutePaths) {
+          prevExtraRoutePaths.push(memo.exportStatic.extraRoutePaths);
+        }
+        memo.exportStatic ?? (memo.exportStatic = {});
+        memo.exportStatic.extraRoutePaths = async () => {
+          const examples = (0, import_assets.getExampleAssets)();
+          const userExtraPaths = [];
+          const isSupportDisablePrerender = import_plugin_utils.semver.gte(api.appData.umi.version, "4.0.48");
+          for (const prev of prevExtraRoutePaths) {
+            userExtraPaths.push(...typeof prev === "function" ? await prev() : prev);
+          }
+          return userExtraPaths.concat(examples.map(({ id }) => {
+            const demoPath = `/${import_constants.SP_ROUTE_PREFIX}demos/${id}`;
+            return isSupportDisablePrerender ? { path: demoPath, prerender: false } : demoPath;
+          }));
+        };
+      }
+      return memo;
+    }
+  });
+};
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {});

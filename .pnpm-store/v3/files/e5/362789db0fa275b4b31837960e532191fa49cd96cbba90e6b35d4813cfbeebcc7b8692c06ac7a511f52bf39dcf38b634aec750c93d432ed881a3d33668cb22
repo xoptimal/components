@@ -1,0 +1,87 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const utils_1 = require("@umijs/utils");
+const path_1 = __importDefault(require("path"));
+const constants_1 = require("../../constants");
+const utils_2 = require("../utils");
+const bundler = (0, utils_1.importLazy)(path_1.default.dirname(require.resolve('@umijs/bundler-webpack/package.json')));
+const { CSSMinifier, JSMinifier, } = (0, utils_1.importLazy)(require.resolve('@umijs/bundler-webpack/dist/types'));
+exports.default = async (opts) => {
+    const enableCache = process.env.FATHER_CACHE !== 'none';
+    for (const config of opts.configProvider.configs) {
+        utils_1.logger.info(`Bundle from ${utils_1.chalk.yellow(config.entry)} to ${utils_1.chalk.yellow(path_1.default.join(config.output.path, config.output.filename))}`);
+        const { plugins: extraPostCSSPlugins, ...postcssLoader } = config.postcssOptions || {};
+        await bundler.build({
+            cwd: opts.cwd,
+            config: {
+                alias: config.alias,
+                autoprefixer: config.autoprefixer,
+                chainWebpack: config.chainWebpack,
+                define: config.define,
+                devtool: config.sourcemap && 'source-map',
+                externals: config.externals,
+                outputPath: config.output.path,
+                // postcss config
+                extraPostCSSPlugins,
+                postcssLoader,
+                ...(config.extractCSS !== false ? {} : { styleLoader: {} }),
+                // less config
+                theme: config.theme,
+                // compatible with IE11 by default
+                targets: (0, utils_2.getBundleTargets)(config),
+                jsMinifier: JSMinifier.terser,
+                cssMinifier: CSSMinifier.cssnano,
+                extraBabelIncludes: [/node_modules/],
+            },
+            entry: {
+                [path_1.default.parse(config.output.filename).name]: path_1.default.join(opts.cwd, config.entry),
+            },
+            babelPreset: [
+                require.resolve('@umijs/babel-preset-umi'),
+                {
+                    presetEnv: {
+                        targets: (0, utils_2.getBundleTargets)(config),
+                    },
+                    presetReact: (0, utils_2.getBabelPresetReactOpts)(opts.configProvider.pkg, opts.cwd),
+                    presetTypeScript: {},
+                    pluginTransformRuntime: {},
+                    pluginLockCoreJS: {},
+                    pluginDynamicImportNode: false,
+                },
+            ],
+            beforeBabelPlugins: [require.resolve('babel-plugin-dynamic-import-node')],
+            extraBabelPresets: config.extraBabelPresets,
+            extraBabelPlugins: config.extraBabelPlugins,
+            // configure library related options
+            chainWebpack(memo) {
+                memo.output.libraryTarget('umd');
+                if (config === null || config === void 0 ? void 0 : config.name) {
+                    memo.output.library(config.name);
+                }
+                // modify webpack target
+                if (config.platform === 'node') {
+                    memo.target('node');
+                }
+                if (enableCache) {
+                    // use father version as cache version
+                    memo.merge({
+                        cache: { version: require('../../../package.json').version },
+                    });
+                }
+                return memo;
+            },
+            // enable webpack persistent cache
+            ...(enableCache
+                ? {
+                    cache: {
+                        buildDependencies: opts.buildDependencies,
+                        cacheDirectory: path_1.default.join(opts.cwd, constants_1.CACHE_PATH, 'bundle-webpack'),
+                    },
+                }
+                : {}),
+        });
+    }
+};
