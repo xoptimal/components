@@ -23,7 +23,7 @@
   "scripts": {
     "build": "father build",
     "build:watch": "father dev",
-    "ci:publish": "pnpm prepublishOnly && pnpm publish -r",
+    "ci:publish": "pnpm prepublishOnly && pnpm publish",
     "ci:version": "changeset version",
     "dev": "dumi dev",
     "docs:build": "dumi build",
