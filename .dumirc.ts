@@ -12,7 +12,8 @@ export default defineConfig({
   title: 'wishingjs-components',
   themeConfig: {
     name: '',
-    logo: '/logo.png',
+    logo: '/components/logo.png',
+    favicon: '/components/favicon.ico',
     socialLinks: {
       github: 'https://github.com/wishingjs/components',
     },
@@ -24,7 +25,7 @@ export default defineConfig({
       {
         title: 'Components',
         link: '/components/popup-window',
-      }
+      },
     ],
     footer: 'Powered by wishingjs',
   },
