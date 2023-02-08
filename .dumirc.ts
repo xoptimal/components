@@ -10,6 +10,7 @@ export default defineConfig({
   base: '/components',
   publicPath: '/components/',
   title: 'wishingjs-components',
+  favicons: ['/components/favicon.ico'],
   themeConfig: {
     name: '',
     logo: '/components/logo.png',
