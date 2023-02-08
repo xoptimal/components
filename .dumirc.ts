@@ -16,7 +16,7 @@ export default defineConfig({
     logo: '/components/logo.png',
     favicon: '/components/favicon.ico',
     socialLinks: {
-      github: 'https://github.com/wishingjs/components',
+      github: 'https://github.com/xoptimal/components',
     },
     nav: [
       {
